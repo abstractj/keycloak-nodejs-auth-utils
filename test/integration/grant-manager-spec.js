@@ -141,12 +141,9 @@ test('GrantManager should be able to remove invalid tokens from a grant', (t) =>
       grant.access_token.signature = Buffer.from('this signature is invalid');
       grant.refresh_token.signature = Buffer.from('this signature is also invalid');
       grant.id_token.signature = Buffer.from('this signature is still invalid');
-      return manager.validateGrant(grant);
-    })
-    .then((grant) => {
-      t.equal(grant.access_token, undefined);
-      t.equal(grant.refresh_token, undefined);
-      t.equal(grant.id_token, undefined);
+      t.throws(function () {
+        manager.validateGrant(grant);
+      }, /Error/);
     })
     .then(t.end);
 });
