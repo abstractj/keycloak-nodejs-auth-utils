@@ -135,15 +135,28 @@ test('GrantManager should be able to validate tokens in a grant', (t) => {
     .then(t.end);
 });
 
-test('GrantManager should be able to remove invalid tokens from a grant', (t) => {
+test('GrantManager in confidential mode should be able to validate a signature', (t) => {
+  let originalAccessToken;
+
   manager.obtainDirectly('test-user', 'tiger')
+
     .then((grant) => {
+      originalAccessToken = grant.access_token;
+
       grant.access_token.signature = Buffer.from('this signature is invalid');
+
       grant.refresh_token.signature = Buffer.from('this signature is also invalid');
+
       grant.id_token.signature = Buffer.from('this signature is still invalid');
-      t.throws(function () {
-        manager.validateGrant(grant);
-      }, /Error/);
+
+      return manager.validateAccessToken(grant.access_token);
     })
+
+    .then((token) => {
+      t.notEqual(token, undefined);
+
+      t.equal(token, originalAccessToken);
+    })
+
     .then(t.end);
 });
