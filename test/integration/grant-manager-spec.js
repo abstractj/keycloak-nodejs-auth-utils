@@ -179,6 +179,14 @@ test('GrantManager return user realm role', (t) => {
     .then(t.end);
 });
 
+test('GrantManager return user realm role based on realm name', (t) => {
+  manager.obtainDirectly('test-user', 'tiger')
+    .then((grant) => {
+      t.true(grant.access_token.hasRole('realm:user'));
+    })
+    .then(t.end);
+});
+
 test('GrantManager validate non existent role', (t) => {
   manager.obtainDirectly('test-user', 'tiger')
     .then((grant) => {
